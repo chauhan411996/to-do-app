@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load custom_filters %}
+{%block breadcrumb%}
+<li class="breadcrumb-item ">{{request.user}}</li>
+<li class="breadcrumb-item active"><a href="#">To-Do List</a></li>
+{%endblock%}
+{%block content%}
+<div class="container-fluid mt-2">
+    <div class="row">
+         <div class="col bg-white ">
+                <div class="input-group input-group-joined border-0 mt-2">
+                    <input class="form-control" id="input-search" type="text"
+                           value="{{request.GET.query|display_values}}"
+                           placeholder="Search Title,Category,Due Date" aria-label="Search" autofocus="">
+                </div>
+            </div>
+    <table style="table-layout:fixed">
+        <th>S.no</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Due Date</th>
+        <th>Action</th>
+   {%for object in object_list%}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td>{{object.title}}</td>
+        <td>{{object.description}}</td>
+        <td>{{object.category}}</td>
+        <td>{{object.due_date}}</td>
+        <td><a href="{% url 'to_do_delete' pk=object.pk %}">Delete</a> <a href="{% url 'to_do_update' pk=object.pk %}">Update</a></td>
+    </tr>
+    {%endfor%}
+        </table>
+        <a href="{% url 'to_do_add' %}"><button>Add Record</button></a>
+    </div>
+</div>
+<script src="/static/assets/js/jquery.min.js"></script>
+<script src="/static/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/js/selectize.min.js"></script>
+<script>
+        $(document).ready(function(){
+
+        var params = new URLSearchParams(location.search);
+
+        $select = $('#input-search').selectize({
+            plugins: ['remove_button'],
+            delimiter: ',',
+            persist: false,
+            create: function(input) {
+                return {
+                        value: input,
+                        text: input,
+                    }
+            },
+            onChange: function(value) {
+                if(value){
+                    params.set('query', value);
+                    window.location.search = params
+                }
+                else{
+                    window.location.search = ""
+                }
+           }
+
+        })
+    });
+
+</script>
+{%endblock%}
